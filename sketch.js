@@ -5,7 +5,9 @@ var astronautCollection = 0;
 var astronautG, asteroidG, asteroid2G, ufoG;
 var score;
 var restartImg;
+var restart;
 var abductionSound, endSound;
+var gameOver;
 
 //Game States
 var PLAY = 1;
@@ -20,9 +22,9 @@ function preload() {
   asteroid2Img = loadImage("Asteroid2.png");
   ufoImg = loadImage("Ufo.png");
   endImg = loadImage("gameOver.png");
-  restartImg = loadImage("restart.png")
-  abductionSound = loadSound("abduction.mp3")
-  endSound = loadSound("end.mp3")
+  restartImg = loadImage("restart.png");
+  abductionSound = loadSound("abduction.mp3");
+  endSound = loadSound("end.mp3");
 }
 
 function setup() {
@@ -32,8 +34,6 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
 
   //Scaling
-  
-
   // Moving background
 
   space = createSprite(width / 2, height / 2);
@@ -46,7 +46,13 @@ function setup() {
   spaceship.addImage(spaceshipImg);
   spaceship.scale = 0.25;
   
+  restart = createSprite(width/2, height/2 + 80);
+  restart.addImage(restartImg);
+  restart.visible = false;
 
+  gameOver = createSprite(width/2, height/2);
+  gameOver.addImage(endImg);
+  gameOver.visible = false;
 
   astronautG = new Group();
   
@@ -77,21 +83,25 @@ function draw() {
     createAsteroid2();
     createUfo();
     if (astronautG.isTouching(spaceship)) {
-      astronautCollection = astronautCollection + 1;
+      astronautCollection = astronautCollection + 100;
+      astronautG.destroyEach()
     }
 
     if (ufoG.isTouching(spaceship)){
       abductionSound.play();
+      abductionSound.setVolume(0.5)
       gameState = END;
     }
     
     if (asteroidG.isTouching(spaceship)){
-      abductionSound.play();
+      endSound.play();
+      endSound.setVolume(0.8)
       gameState = END;
     }
 
     if (asteroid2G.isTouching(spaceship)){
-      abductionSound.play();
+      endSound.play();
+      endSound.setVolume(0.8)
       gameState = END;
     }
 
@@ -99,11 +109,12 @@ function draw() {
     if (space.y > height/0.5) {
       space.y = height / 8;
     }
-    restartImg.visible = true;
-    spaceship.addImage(endImg);
-    spaceship.x = width / 2;
-    spaceship.y = height / 2;
-    spaceship.scale = 0.6;
+    restart.visible = true;
+    //spaceship.addImage(endImg);
+   // spaceship.x = width / 2;
+   // spaceship.y = height / 2;
+   // spaceship.scale = 0.6;
+   gameOver.visible = true
 
     astronautG.destroyEach();
     asteroidG.destroyEach();
@@ -115,8 +126,9 @@ function draw() {
     asteroid2G.setVelocityYEach(0);
     ufoG.setVelocityYEach(0);
 
-    //if(mousePressedOver(restartImg)) {
-     //reset();
+    if(mousePressedOver(restart)) {
+     reset();
+    }
   }
 
   drawSprites();
